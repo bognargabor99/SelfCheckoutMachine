@@ -3,12 +3,12 @@
     public interface ICurrencyService
     {
         // Responsible for storing the inserted bills and coins in the machine
-        IDictionary<string, decimal> Store(IDictionary<string, decimal> inserted);
+        IDictionary<string, uint> Store(IDictionary<string, uint> inserted);
 
         // Returns available bills and coins stored in the machine
-        IDictionary<string, decimal> List();
+        IDictionary<string, uint> List();
 
         // Handles checkouts, updates available denominations
-        IDictionary<string, decimal> Checkout(IDictionary<string, decimal> inserted, decimal price);
+        IDictionary<string, uint> Checkout(IDictionary<string, uint> inserted, uint price);
     }
 }

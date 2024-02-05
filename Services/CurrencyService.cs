@@ -11,7 +11,7 @@ namespace SelfCheckoutMachine.Services
     {
         private readonly List<string> AcceptedDenominations = ["5", "10", "20", "50", "100", "200", "500", "1000", "2000", "5000", "10000", "20000"];
 
-        private readonly ConcurrentDictionary<string, decimal> _currencies = new();
+        private readonly ConcurrentDictionary<string, uint> _currencies = new();
 
         public CurrencyService()
         {
@@ -20,17 +20,17 @@ namespace SelfCheckoutMachine.Services
                 _currencies[currency] = 0;
         }
 
-        public IDictionary<string, decimal> Checkout(IDictionary<string, decimal> inserted, decimal price)
+        public IDictionary<string, uint> Checkout(IDictionary<string, uint> inserted, uint price)
         {
             throw new NotImplementedException();
         }
 
-        public IDictionary<string, decimal> List()
+        public IDictionary<string, uint> List()
         {
             return _currencies;
         }
 
-        public IDictionary<string, decimal> Store(IDictionary<string, decimal> inserted)
+        public IDictionary<string, uint> Store(IDictionary<string, uint> inserted)
         {
             // Check if inserted money is of valid denominations
             if (!TryCheckInsertedDenominations(inserted.Keys, out var message))
