@@ -18,6 +18,7 @@ namespace SelfCheckoutMachine.Controllers
         [HttpGet]
         public IActionResult ListStock()
         {
+            Console.WriteLine("Listing available denominations with amount of bills/coins of them...");
             return this.Ok(this.currencyService.List());
         }
 
@@ -28,12 +29,14 @@ namespace SelfCheckoutMachine.Controllers
         [HttpPost]
         public IActionResult Load([FromBody] IDictionary<string, uint> loaded)
         {
+            Console.WriteLine("Loading money into the machine...");
             try
             {
                 return this.Ok(this.currencyService.Store(loaded));
             }
             catch (ArgumentException e)
             {
+                Console.WriteLine($"Something happened while loading money into machine. See the message below.\n\t{e.Message}");
                 return this.BadRequest(e.Message);
             }
         }
