@@ -7,9 +7,9 @@ namespace SelfCheckoutMachine.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class StockController(ICurrencyService _currencyService) : ControllerBase
+    public class StockController(IStockService _currencyService) : ControllerBase
     {
-        private ICurrencyService currencyService { get; set; } = _currencyService;
+        private readonly IStockService currencyService = _currencyService;
 
         /// <summary>
         /// Returns stored bills and coins.
