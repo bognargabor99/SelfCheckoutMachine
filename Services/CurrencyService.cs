@@ -20,17 +20,7 @@ namespace SelfCheckoutMachine.Services
                 _currencies[currency] = 0;
         }
 
-        /// <summary>
-        /// Handles checkouts by storing the given money, calculating and returning the change to be provided to the customer.<br />
-        /// The transaction fails if one of the following statements is true:<br />
-        /// 1. At least one of the inserted denominations is invalid<br />
-        /// 2. Not enough money is inserted by the customer<br />
-        /// 3. Exact amount of change cannot be provided<br />
-        /// </summary>
-        /// <param name="inserted">The inserted money by the user</param>
-        /// <param name="price">The price of the purchase</param>
-        /// <returns>The calculated change</returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <inheritdoc />
         public IDictionary<string, uint> Checkout(IDictionary<string, uint> inserted, uint price)
         {
             // Check if inserted money is of valid denominations
@@ -63,21 +53,13 @@ namespace SelfCheckoutMachine.Services
             }
         }
 
-        /// <summary>
-        /// Returns the state of the machine
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc />
         public IDictionary<string, uint> List()
         {
             return _currencies;
         }
 
-        /// <summary>
-        /// Stores the given amount of money in the machine
-        /// </summary>
-        /// <param name="inserted">Tha amount of money to be stored</param>
-        /// <returns>The new state of the machine</returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <inheritdoc />
         public IDictionary<string, uint> Store(IDictionary<string, uint> inserted)
         {
             // Check if inserted money is of valid denominations
