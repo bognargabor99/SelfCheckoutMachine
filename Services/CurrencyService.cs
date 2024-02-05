@@ -32,7 +32,37 @@ namespace SelfCheckoutMachine.Services
 
         public IDictionary<string, decimal> Store(IDictionary<string, decimal> inserted)
         {
-            throw new NotImplementedException();
+            // Check if inserted money is of valid denominations
+            if (!TryCheckInsertedDenominations(inserted.Keys, out var message))
+            {
+                throw new ArgumentException(message);
+            }
+            
+            foreach (var denomination in inserted)
+                _currencies[denomination.Key] += denomination.Value;
+
+            return this._currencies;
+        }
+
+        /// <summary>
+        /// Checks if inserted money is of accepted denominations
+        /// </summary>
+        /// <param name="denominations">Inserted types of denominations</param>
+        /// <param name="message">An error message if an inserted denomination is not accepted</param>
+        /// <returns>True if all inserted denominations are accepted, false otherwise</returns>
+        private bool TryCheckInsertedDenominations(ICollection<string> denominations, out string message)
+        {
+            foreach (var denom in denominations)
+            {
+                if (!this.AcceptedDenominations.Contains(denom))
+                {
+                    message = $"Unrecognized denomination ({denom}) was inserted. Operation aborted.\n" +
+                              $"See accepted denominations: {string.Join(", ", this.AcceptedDenominations)}";
+                    return false;
+                }
+            }
+            message = string.Empty;
+            return true;
         }
     }
 }
