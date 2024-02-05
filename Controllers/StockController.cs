@@ -21,10 +21,21 @@ namespace SelfCheckoutMachine.Controllers
             return this.Ok(this.currencyService.List());
         }
 
-        // POST api/<StockController>
+        /// <summary>
+        /// Loads the given amount of bills and coins into the machine
+        /// </summary>
+        /// <param name="loaded"></param>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Load([FromBody] IDictionary<string, uint> loaded)
         {
+            try
+            {
+                return this.Ok(this.currencyService.Store(loaded));
+            }
+            catch (ArgumentException e)
+            {
+                return this.BadRequest(e.Message);
+            }
         }
     }
 }
