@@ -22,7 +22,15 @@ namespace SelfCheckoutMachine.Services
 
         public IDictionary<string, uint> Checkout(IDictionary<string, uint> inserted, uint price)
         {
-            throw new NotImplementedException();
+            // Check if inserted money is of valid denominations
+            if (!CheckInsertedDenominations(inserted.Keys, out var message))
+                throw new ArgumentException(message);
+            
+            // Check if price if enough
+            if (!CheckEnoughMoneyInserted(inserted, price, out message))
+                throw new ArgumentException(message);
+            
+            return null;
         }
 
         public IDictionary<string, uint> List()
@@ -33,7 +41,7 @@ namespace SelfCheckoutMachine.Services
         public IDictionary<string, uint> Store(IDictionary<string, uint> inserted)
         {
             // Check if inserted money is of valid denominations
-            if (!TryCheckInsertedDenominations(inserted.Keys, out var message))
+            if (!CheckInsertedDenominations(inserted.Keys, out var message))
             {
                 throw new ArgumentException(message);
             }
@@ -50,7 +58,7 @@ namespace SelfCheckoutMachine.Services
         /// <param name="denominations">Inserted types of denominations</param>
         /// <param name="message">An error message if an inserted denomination is not accepted</param>
         /// <returns>True if all inserted denominations are accepted, false otherwise</returns>
-        private bool TryCheckInsertedDenominations(ICollection<string> denominations, out string message)
+        private bool CheckInsertedDenominations(ICollection<string> denominations, out string message)
         {
             foreach (var denom in denominations)
             {
@@ -60,6 +68,26 @@ namespace SelfCheckoutMachine.Services
                               $"See accepted denominations: {string.Join(", ", this.AcceptedDenominations)}";
                     return false;
                 }
+            }
+            message = string.Empty;
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if the inserted money is enough for the purchase
+        /// </summary>
+        /// <param name="inserted">The inserted bills/coins by denominations and the amount of each denomination</param>
+        /// <param name="price">The price of the purchase</param>
+        /// <param name="message">An error message if the provided money is not enough</param>
+        /// <returns>True if the user inserted enough money, false otherwise</returns>
+        private static bool CheckEnoughMoneyInserted(IDictionary<string, uint> inserted, uint price, out string message)
+        {
+            var insertedAmount = inserted.Sum(x => uint.Parse(x.Key) * x.Value);
+
+            if (insertedAmount < price)
+            {
+                message = $"The amount of inserted money ({insertedAmount}) is less than the price ({price}). Operation aborted.";
+                return false;
             }
             message = string.Empty;
             return true;
