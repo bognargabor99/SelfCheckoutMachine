@@ -9,6 +9,6 @@ You can also launch it inside Visual Studio. In this case, the API can have an H
 The above settings can be change in Properties/lauchSettings.json
 
 Endpoints:
-GET  /api/v1/Stock
-POST /api/v1/Stock
-POST /api/v1/Checkout
+- GET  /api/v1/Stock
+- POST /api/v1/Stock
+- POST /api/v1/Checkout
