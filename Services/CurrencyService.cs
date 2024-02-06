@@ -153,7 +153,8 @@ namespace SelfCheckoutMachine.Services
 
             if (changeAmount > 0)
             {
-                var indexOfDenomination = IndexOfMaxDenomination(changeAmount);
+                var maxDenominationInChange = 20000;
+                TryFindIndexOfMaxDenomination(changeAmount, maxDenominationInChange, out var indexOfDenomination);
 
                 while (changeAmount > 0 && indexOfDenomination >= 0)
                 {
@@ -167,10 +168,17 @@ namespace SelfCheckoutMachine.Services
                     change[this.AcceptedDenominations[indexOfDenomination]] = (uint)countOfDenominationInChange;
 
                     // If the denomination cannot lowered, break the loop
-                    if (indexOfDenomination == 0)
+                    if (indexOfDenomination == 0 || changeAmount == 0)
                         break;
 
-                    indexOfDenomination = IndexOfMaxDenomination(changeAmount);
+                    while (!TryFindIndexOfMaxDenomination(changeAmount, maxDenominationInChange, out indexOfDenomination) && maxDenominationInChange > 5)
+                    {
+                        changeAmount += change.Select(x => int.Parse(x.Key) * x.Value).Sum();
+                        change.Clear();
+                        
+                        var indexOfNewDenomination = this.AcceptedDenominations.IndexOf(maxDenominationInChange.ToString());
+                        maxDenominationInChange = int.Parse(this.AcceptedDenominations[indexOfNewDenomination - 1]);
+                    }
                 }
 
                 if (changeAmount != 0)
@@ -190,12 +198,22 @@ namespace SelfCheckoutMachine.Services
         /// Index of the denomination that:<br />
         ///     1. Is not higher than the amount of change to be provided<br />
         ///     2. The machine has at least one (bill/coin) of</returns>
-        private int IndexOfMaxDenomination(long changeAmount)
+        private bool TryFindIndexOfMaxDenomination(long changeAmount, int maxDenomination, out int indexOfDenomination)
         {
-            var denominationOfChange = this.AcceptedDenominations.Where(x => this._currencies[x] != 0).Select(x => uint.Parse(x)).Where(x => x <= changeAmount).Max();
-            var indexOfDenomination = this.AcceptedDenominations.IndexOf(denominationOfChange.ToString());
+            var denominationsOfChange = this.AcceptedDenominations
+                .Where(x => this._currencies[x] != 0)
+                .Select(x => uint.Parse(x))
+                .Where(x => x <= changeAmount && x <= maxDenomination);
 
-            return indexOfDenomination;
+            if (!denominationsOfChange.Any())
+            {
+                indexOfDenomination = -1;
+                return false;
+            }
+            
+            indexOfDenomination = this.AcceptedDenominations.IndexOf(denominationsOfChange.Max().ToString());
+
+            return true;
         }
     }
 }
