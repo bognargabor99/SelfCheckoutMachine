@@ -173,6 +173,9 @@ namespace SelfCheckoutMachine.Services
 
                     while (!TryFindIndexOfMaxDenomination(changeAmount, maxDenominationInChange, out indexOfDenomination) && maxDenominationInChange > 5)
                     {
+                        // If the change cannot be provided using the largest kinds of bills
+                        // then I try to use smaller and smaller kind of bills/coins
+
                         changeAmount += change.Select(x => int.Parse(x.Key) * x.Value).Sum();
                         change.Clear();
                         
