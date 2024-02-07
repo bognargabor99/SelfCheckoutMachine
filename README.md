@@ -14,6 +14,9 @@ The application needs .NET 8 to run and a local mysql database which can be host
 The port and database settings can be changed in `Properties/lauchSettings.json` and `appsettings.json`
 
 Endpoints:
+
 GET  /api/v1/Stock
+
 POST /api/v1/Stock
+
 POST /api/v1/Checkout
