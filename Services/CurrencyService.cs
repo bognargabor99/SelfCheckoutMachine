@@ -178,16 +178,21 @@ namespace SelfCheckoutMachine.Services
                     if (indexOfDenomination == 0 || changeAmount == 0)
                         break;
 
+                    // We cannot use the current denomination again
+                    // Therefore, we change the maximum denomination to a smaller one
+                    // For example, we used 1000 -> in the next cycle we can only use 500 or lower
+                    maxDenominationInChange = int.Parse(this.AcceptedDenominations[this.AcceptedDenominations.IndexOf(denomination.ToString()) - 1]);
+
                     while (!TryFindIndexOfMaxDenomination(changeAmount, maxDenominationInChange, out indexOfDenomination) && maxDenominationInChange > 5)
                     {
                         // If the change cannot be provided using the largest kinds of bills
-                        // then I try to use smaller and smaller kind of bills/coins
+                        // then I try to use smaller and smaller kinds of bills/coins
 
                         changeAmount += change.Select(x => int.Parse(x.Key) * x.Value).Sum();
                         change.Clear();
                         
                         var indexOfNewDenomination = this.AcceptedDenominations.IndexOf(maxDenominationInChange.ToString());
-                        maxDenominationInChange = int.Parse(this.AcceptedDenominations[indexOfNewDenomination - 1]);
+                        maxDenominationInChange = int.Parse(this.AcceptedDenominations[indexOfNewDenomination]);
                     }
                 }
 
