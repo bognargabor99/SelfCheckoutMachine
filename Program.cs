@@ -1,11 +1,14 @@
+using SelfCheckoutMachine.Model;
 using SelfCheckoutMachine.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add DbContext
+builder.Services.AddDbContext<CurrencyContext>();
+
 // Add services to the container.
-builder.Services.AddSingleton<CurrencyService>();
-builder.Services.AddSingleton<IStockService, CurrencyService>(x => x.GetRequiredService<CurrencyService>());
-builder.Services.AddSingleton<ICheckoutService, CurrencyService>(x => x.GetRequiredService<CurrencyService>());
+builder.Services.AddTransient<IStockService, CurrencyService>();
+builder.Services.AddTransient<ICheckoutService, CurrencyService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
