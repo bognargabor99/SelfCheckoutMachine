@@ -37,18 +37,18 @@ namespace SelfCheckoutMachine.Model
         {
             modelBuilder.Entity<Denomination>()
                 .HasData(
-                    new Denomination { Value = "5",     Amount = 0 },
-                    new Denomination { Value = "10",    Amount = 0 },
-                    new Denomination { Value = "20",    Amount = 0 },
-                    new Denomination { Value = "50",    Amount = 0 },
-                    new Denomination { Value = "100",   Amount = 0 },
-                    new Denomination { Value = "200",   Amount = 0 },
-                    new Denomination { Value = "500",   Amount = 0 },
-                    new Denomination { Value = "1000",  Amount = 0 },
-                    new Denomination { Value = "2000",  Amount = 0 },
-                    new Denomination { Value = "5000",  Amount = 0 },
-                    new Denomination { Value = "10000", Amount = 0 },
-                    new Denomination { Value = "20000", Amount = 0 }
+                    new Denomination { Id = 1,  Value = "5",     Amount = 0 },
+                    new Denomination { Id = 2,  Value = "10",    Amount = 0 },
+                    new Denomination { Id = 3,  Value = "20",    Amount = 0 },
+                    new Denomination { Id = 4,  Value = "50",    Amount = 0 },
+                    new Denomination { Id = 5,  Value = "100",   Amount = 0 },
+                    new Denomination { Id = 6,  Value = "200",   Amount = 0 },
+                    new Denomination { Id = 7,  Value = "500",   Amount = 0 },
+                    new Denomination { Id = 8,  Value = "1000",  Amount = 0 },
+                    new Denomination { Id = 9,  Value = "2000",  Amount = 0 },
+                    new Denomination { Id = 10, Value = "5000",  Amount = 0 },
+                    new Denomination { Id = 11, Value = "10000", Amount = 0 },
+                    new Denomination { Id = 12, Value = "20000", Amount = 0 }
                 );
         }
     }
