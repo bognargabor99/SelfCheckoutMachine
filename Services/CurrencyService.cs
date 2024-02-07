@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+﻿using SelfCheckoutMachine.Model;
 
 namespace SelfCheckoutMachine.Services
 {
@@ -9,18 +9,14 @@ namespace SelfCheckoutMachine.Services
     /// </summary>
     public class CurrencyService : ICurrencyService
     {
-        private readonly List<string> AcceptedDenominations = ["5", "10", "20", "50", "100", "200", "500", "1000", "2000", "5000", "10000", "20000"];
+        private readonly List<string> AcceptedDenominations = [];
 
-        private readonly ConcurrentDictionary<string, uint> _currencies = new();
+        private CurrencyContext CurrencyContext { get; set; }
 
-        public CurrencyService()
+        public CurrencyService(CurrencyContext context)
         {
-            // Initializing stored amounts to zero (no money is stored in the beginning)
-            foreach (var currency in AcceptedDenominations)
-                _currencies[currency] = 0;
-
-            Console.WriteLine($"The self-checkout machine has started. The machine only accepts the following denominations: {string.Join(", ", this.AcceptedDenominations)}");
-            Console.WriteLine("Initialized machine with no money in it.");
+            this.CurrencyContext = context;
+            this.AcceptedDenominations = this.CurrencyContext.Denominations.Select(x => x.Value).ToList();
         }
 
         /// <inheritdoc />
@@ -42,10 +38,11 @@ namespace SelfCheckoutMachine.Services
                 throw new ArgumentException(message);
             }
             Console.WriteLine("The customer provided valid denominations and enough money to pay for the purchase.");
-            
-            foreach (var denomination in inserted)
-                _currencies[denomination.Key] += denomination.Value;
 
+            foreach (var denomination in inserted)
+                this.CurrencyContext.Denominations.Single(x => x.Value == denomination.Key).Amount += denomination.Value;
+            
+            this.CurrencyContext.SaveChanges();
 
             // Calculate change if it can be provided
             Console.WriteLine("The change is being calculated...");
@@ -55,7 +52,9 @@ namespace SelfCheckoutMachine.Services
                 Console.WriteLine($"See the error message: {message}");
 
                 foreach (var denomination in inserted)
-                    _currencies[denomination.Key] -= denomination.Value;
+                    this.CurrencyContext.Denominations.Single(x => x.Value == denomination.Key).Amount -= denomination.Value;
+
+                this.CurrencyContext.SaveChanges();
 
                 throw new ArgumentException(message);
             }
@@ -63,7 +62,9 @@ namespace SelfCheckoutMachine.Services
             {
                 Console.WriteLine("The exact change can be provided.");
                 foreach (var denomination in change)
-                    _currencies[denomination.Key] -= denomination.Value;
+                    this.CurrencyContext.Denominations.Single(x => x.Value == denomination.Key).Amount -= denomination.Value;
+
+                this.CurrencyContext.SaveChanges();
 
                 Console.WriteLine("The inserted money is stored in the machine and the change is given back.");
                 Console.WriteLine($"The change is ({string.Join(", ", change.Select(x => $"\"{x.Key}\": {x.Value}"))})");
@@ -75,7 +76,11 @@ namespace SelfCheckoutMachine.Services
         /// <inheritdoc />
         public IDictionary<string, uint> List()
         {
-            return _currencies;
+            var dict = new Dictionary<string, uint>();
+            foreach (var denomination in this.CurrencyContext.Denominations)
+                dict.Add(denomination.Value, denomination.Amount);
+
+            return dict;
         }
 
         /// <inheritdoc />
@@ -88,11 +93,13 @@ namespace SelfCheckoutMachine.Services
             }
 
             foreach (var denomination in inserted)
-                _currencies[denomination.Key] += denomination.Value;
+                this.CurrencyContext.Denominations.Single(x => x.Value == denomination.Key).Amount += denomination.Value;
+
+            this.CurrencyContext.SaveChanges();
 
             Console.WriteLine("The denominations to be stored are valid and saved.");
 
-            return this._currencies;
+            return this.List();
         }
 
         /// <summary>
@@ -161,8 +168,8 @@ namespace SelfCheckoutMachine.Services
                     var denomination = uint.Parse(this.AcceptedDenominations[indexOfDenomination]);
 
                     // Calculate how many bills/coins can we use of the current denomination
-                    var countOfDenominationInChange = Math.Min(changeAmount / denomination, this._currencies[denomination.ToString()]);
-
+                    var countOfDenominationInChange = Math.Min(changeAmount / denomination, this.CurrencyContext.Denominations.Single(x => x.Value == denomination.ToString()).Amount);
+                    
                     // Decrease the changeAmount, set used amount of bills/coins
                     changeAmount -= denomination * countOfDenominationInChange;
                     change[this.AcceptedDenominations[indexOfDenomination]] = (uint)countOfDenominationInChange;
@@ -204,7 +211,7 @@ namespace SelfCheckoutMachine.Services
         private bool TryFindIndexOfMaxDenomination(long changeAmount, int maxDenomination, out int indexOfDenomination)
         {
             var denominationsOfChange = this.AcceptedDenominations
-                .Where(x => this._currencies[x] != 0)
+                .Where(x => this.CurrencyContext.Denominations.Single(d => d.Value == x).Amount != 0)
                 .Select(x => uint.Parse(x))
                 .Where(x => x <= changeAmount && x <= maxDenomination);
 
