@@ -188,11 +188,17 @@ namespace SelfCheckoutMachine.Services
                         // If the change cannot be provided using the largest kinds of bills
                         // then I try to use smaller and smaller kinds of bills/coins
 
+                        if (!change.Any())
+                        {
+                            maxDenominationInChange = 5;
+                            continue;
+                        }
+
+                        var indexOfNewDenomination = this.AcceptedDenominations.IndexOf(change.Keys.Select(x => int.Parse(x)).Max().ToString()) - 1;
+                        maxDenominationInChange = int.Parse(this.AcceptedDenominations[indexOfNewDenomination]);
+                        
                         changeAmount += change.Select(x => int.Parse(x.Key) * x.Value).Sum();
                         change.Clear();
-                        
-                        var indexOfNewDenomination = this.AcceptedDenominations.IndexOf(maxDenominationInChange.ToString());
-                        maxDenominationInChange = int.Parse(this.AcceptedDenominations[indexOfNewDenomination]);
                     }
                 }
 
